@@ -10,37 +10,8 @@ public class p1{
 	private static Vector<Integer> facBase = new Vector<Integer>();
 	private static long L;
 	private static Vector<BigInteger> rList = new Vector<BigInteger>();
-	private static Vector<BigInteger> facRList = new Vector<BigInteger>();
-
-/*
-	public static void _generateRList(){
-		int count = 0;
-		long sqrtL = (long)Math.sqrt(L)+1;
-		sqrtL = 2000;
-		for (BigInteger j = BigInteger.valueOf(1); j.compareTo(BigInteger.valueOf(sqrtL)) <= 0; j = j.add(BigInteger.ONE)){
-			for (BigInteger k = BigInteger.valueOf(1); k.compareTo(BigInteger.valueOf(sqrtL)) <= 0; k = k.add(BigInteger.ONE)){
-				rList.add(generateR(k, j));	
-			//	if (++count >= L)return;
-			}
-		}
-	}
-
-	public static void cleanRList(){
-		for (int i = 0; i < rList.size(); i++){
-			BigInteger y = (rList.get(i).multiply(rList.get(i))).mod(N);
-			for (int j = 0; j < facBase.size(); j++){
-				while (y.mod(BigInteger.valueOf(facBase.get(j))).compareTo(BigInteger.ZERO) == 0){
-					y = y.divide(BigInteger.valueOf(facBase.get(j)));
-						
-					if (y.compareTo(BigInteger.ONE) ==0)
-						facRList.add(rList.get(i));
-				}
-
-			}
-		}
-
-	}
-*/
+	private static int[][] inMatrix;
+	private static int[][] outMatrix;
 
 	public static boolean isPrime(int num){
 		if (num<2) return false;
@@ -78,6 +49,7 @@ public class p1{
 		int max = 1;
 		int k = max;
 		int j = max;
+		inMatrix = new int[(int)L][facBase.size()];
 		do {
 			BigInteger x = generateR(BigInteger.valueOf(k), BigInteger.valueOf(j)); 
 			addFactor(x, (x.multiply(x)).mod(N));
@@ -100,20 +72,103 @@ public class p1{
 		for (int j = 0; j < facBase.size(); j++){
 			while (y.mod(BigInteger.valueOf(facBase.get(j))).compareTo(BigInteger.ZERO) == 0){
 				y = y.divide(BigInteger.valueOf(facBase.get(j)));
-					
+				
+				inMatrix[rList.size()][j]++;	
 				if (y.compareTo(BigInteger.ONE) ==0)
 					rList.add(x);
 			}
 		}
 	}
 
+	public static void makeWrite(){
+		try{
+			PrintWriter writer = new PrintWriter("in", "UTF-8");
+			writer.println(L + " " + facBase.size());
+			for (int i = 0; i < L; i++){
+				for (int j = 0; j < facBase.size(); j++){
+					writer.print(inMatrix[i][j] +  " ");
+				}
+				writer.println();
+			}
+			writer.close();
+
+		} catch (Exception e) {
+		
+		}
+
+	}
+
+	public static void execGauss(){
+		String[] execArray = new String[]{"./GaussBin.exe", "in", "out"};
+		try {
+			Process p = Runtime.getRuntime().exec(execArray);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+
+	public static void readOut(){
+		try {
+			Scanner inFile = new Scanner(new File("out"));
+			int i = inFile.nextInt();
+			outMatrix = new int[i][(int)L];
+			int count = 0;
+			int row = 0;
+			while (inFile.hasNextInt()){
+				i = inFile.nextInt();
+				outMatrix[row][count] = i;
+				if (count == L-1){
+					row++;
+					count = 0;
+				}
+				else
+					count++;
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+	}
+
+	public static void createSolutionsMatrix(){
+		makeWrite();
+		execGauss();
+		readOut();
+	}
+
+	public static BigInteger computePrimes(){
+		BigInteger ySquared;
+		BigInteger x;
+		for (int i = 1; i < outMatrix.length; i++){
+			ySquared = BigInteger.ONE;
+			x = BigInteger.ONE;
+			for (int j = 1; j < outMatrix[1].length; j++){
+				if (outMatrix[i][j] != 0){
+					for (int k = 0; k < inMatrix[1].length; k++){
+						int z = (int)Math.pow(facBase.get(k), inMatrix[j][k]);
+						ySquared = ySquared.multiply(BigInteger.valueOf(z));
+					}
+					x = x.multiply(rList.get(j));
+				}
+			}
+			BigInteger dif = ((squareRoot(ySquared)).subtract(x)).gcd(N);
+			if (dif.compareTo(N) != 0 && dif.compareTo(BigInteger.ONE) != 0){
+				return dif;
+			}
+		}
+		return BigInteger.ONE;
+	}
+
 	public static void main(String[] args){
 		N = new BigInteger(args[0]);
 		initFacBase();
 		L = facBase.size()+5;
-//		System.out.println(facBase.size());
 		generateRList();
-//		System.out.println(rList);
-//		System.out.println(rList.size());
+		createSolutionsMatrix();
+		BigInteger factor = computePrimes();
+
+		System.out.println(N.divide(factor) + " " +  factor);
 	}
 }
