@@ -6,7 +6,7 @@ import java.lang.*;
 public class p1{
 	
 	private static BigInteger N;
-	private static int bound = 1024;
+	private static int bound = 16000;
 	private static Vector<Integer> facBase = new Vector<Integer>();
 	private static long L;
 	private static Vector<BigInteger> rList = new Vector<BigInteger>();
@@ -96,7 +96,7 @@ public class p1{
 						if (inMatrixStringTable.contains(boolString)) {
 							System.out.println("Already has equivalent");
 						} else {
-							//System.out.println("Added");
+							if (((L - rList.size())%10) ==0)System.out.println((L - rList.size()) + "Added: " + x);
 							rList.add(x);
 							added = true;
 						}
@@ -199,9 +199,12 @@ public class p1{
 	public static void main(String[] args){
 		N = new BigInteger(args[0]);
 		initFacBase();
+		System.out.println("a");
 		L = facBase.size()+10;
 		generateRList();
+		System.out.println("b");
 		createSolutionsMatrix();
+		System.out.println("c");
 		BigInteger factor = computePrimes();
 
 		System.out.println(N.divide(factor) + " " +  factor);
