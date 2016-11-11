@@ -6,7 +6,7 @@ import java.lang.*;
 public class p1{
 	
 	private static BigInteger N;
-	private static int bound = 30;
+	private static int bound = 1024;
 	private static Vector<Integer> facBase = new Vector<Integer>();
 	private static long L;
 	private static Vector<BigInteger> rList = new Vector<BigInteger>();
@@ -67,7 +67,6 @@ public class p1{
 				j--; continue;
 			}
 		} while (rList.size() < L);
-		System.out.println(rList.size());
 	}
 
 	public static void addFactor(BigInteger x, BigInteger y){
@@ -131,7 +130,6 @@ public class p1{
 		} catch (Exception e) {
 		
 		}
-		System.out.println(inMatrix);
 
 	}
 
@@ -171,8 +169,8 @@ public class p1{
 
 	public static void createSolutionsMatrix(){
 		makeWrite();
-		//execGauss();
-		//readOut();
+		execGauss();
+		readOut();
 	}
 
 	public static BigInteger computePrimes(){
@@ -201,11 +199,11 @@ public class p1{
 	public static void main(String[] args){
 		N = new BigInteger(args[0]);
 		initFacBase();
-		L = facBase.size()+5;
+		L = facBase.size()+10;
 		generateRList();
 		createSolutionsMatrix();
-		//BigInteger factor = computePrimes();
+		BigInteger factor = computePrimes();
 
-		//System.out.println(N.divide(factor) + " " +  factor);
+		System.out.println(N.divide(factor) + " " +  factor);
 	}
 }
