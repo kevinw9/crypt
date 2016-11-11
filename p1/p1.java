@@ -6,12 +6,13 @@ import java.lang.*;
 public class p1{
 	
 	private static BigInteger N;
-	private static int bound = 1000;
+	private static int bound = 30;
 	private static Vector<Integer> facBase = new Vector<Integer>();
 	private static long L;
 	private static Vector<BigInteger> rList = new Vector<BigInteger>();
 	private static int[][] inMatrix;
 	private static int[][] outMatrix;
+	private static Hashtable<String,Boolean> inMatrixStringTable = new Hashtable<String,Boolean>();
 
 	public static boolean isPrime(int num){
 		if (num<2) return false;
@@ -66,18 +67,53 @@ public class p1{
 				j--; continue;
 			}
 		} while (rList.size() < L);
+		System.out.println(rList.size());
 	}
 
 	public static void addFactor(BigInteger x, BigInteger y){
+		String boolString = "";
+		//System.out.println(" ");
+		//System.out.println("New Number " + y);
+		boolean added = false;
 		for (int j = 0; j < facBase.size(); j++){
 			while (y.mod(BigInteger.valueOf(facBase.get(j))).compareTo(BigInteger.ZERO) == 0){
+				//System.out.println("Divides by " + facBase.get(j));
 				y = y.divide(BigInteger.valueOf(facBase.get(j)));
 				
-				inMatrix[rList.size()][j]++;	
-				if (y.compareTo(BigInteger.ONE) ==0)
-					rList.add(x);
+				inMatrix[rList.size()][j]++;
+				
+				if (y.compareTo(BigInteger.ONE) ==0) {
+					if (rList.contains(x)) {
+						//System.out.println("Already has it");
+					} else {
+						
+						for (int i = 0; i < facBase.size(); i++) {
+							if (((inMatrix[rList.size()][i]) % 2) == 0) {
+								boolString += "0";
+							} else {
+								boolString += "1";
+							}
+						}
+						if (inMatrixStringTable.contains(boolString)) {
+							System.out.println("Already has equivalent");
+						} else {
+							//System.out.println("Added");
+							rList.add(x);
+							added = true;
+						}
+					}
+				}
+			}
+			
+		}
+		if (added) {
+			inMatrixStringTable.put(boolString, true);
+		} else {
+			for (int i = 0; i < facBase.size(); i++) {
+				inMatrix[rList.size()][i] = 0;
 			}
 		}
+		//System.out.println(inMatrixStringTable.get(boolString));
 	}
 
 	public static void makeWrite(){
@@ -86,7 +122,7 @@ public class p1{
 			writer.println(L + " " + facBase.size());
 			for (int i = 0; i < L; i++){
 				for (int j = 0; j < facBase.size(); j++){
-					writer.print(inMatrix[i][j] +  " ");
+					writer.print(((inMatrix[i][j])) +  " ");
 				}
 				writer.println();
 			}
@@ -95,6 +131,7 @@ public class p1{
 		} catch (Exception e) {
 		
 		}
+		System.out.println(inMatrix);
 
 	}
 
@@ -134,8 +171,8 @@ public class p1{
 
 	public static void createSolutionsMatrix(){
 		makeWrite();
-		execGauss();
-		readOut();
+		//execGauss();
+		//readOut();
 	}
 
 	public static BigInteger computePrimes(){
@@ -167,8 +204,8 @@ public class p1{
 		L = facBase.size()+5;
 		generateRList();
 		createSolutionsMatrix();
-		BigInteger factor = computePrimes();
+		//BigInteger factor = computePrimes();
 
-		System.out.println(N.divide(factor) + " " +  factor);
+		//System.out.println(N.divide(factor) + " " +  factor);
 	}
 }
