@@ -96,7 +96,7 @@ public class p1{
 						if (inMatrixStringTable.contains(boolString)) {
 							System.out.println("Already has equivalent");
 						} else {
-							if (((L - rList.size())%10) ==0)System.out.println((L - rList.size()) + "Added: " + x);
+						//	if (((L - rList.size())%10) ==0)System.out.println((L - rList.size()) + "Added: " + x);
 							rList.add(x);
 							added = true;
 						}
@@ -200,12 +200,9 @@ public class p1{
 		long primeTimeStart = System.nanoTime();
 		N = new BigInteger(args[0]);
 		initFacBase();
-		System.out.println("a");
 		L = facBase.size()+10;
 		generateRList();
-		System.out.println("b");
 		createSolutionsMatrix();
-		System.out.println("c");
 		BigInteger factor = computePrimes();
 
 		System.out.println(N.divide(factor) + " " +  factor);
