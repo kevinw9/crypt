@@ -197,6 +197,7 @@ public class p1{
 	}
 
 	public static void main(String[] args){
+		long primeTimeStart = System.nanoTime();
 		N = new BigInteger(args[0]);
 		initFacBase();
 		System.out.println("a");
@@ -208,5 +209,8 @@ public class p1{
 		BigInteger factor = computePrimes();
 
 		System.out.println(N.divide(factor) + " " +  factor);
+		long primeTimeEnd = System.nanoTime();
+		long durationSeconds = (primeTimeEnd - primeTimeStart) / 1000000000;
+		System.out.println("Total Execution Time: " + durationSeconds + " seconds");
 	}
 }
