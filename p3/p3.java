@@ -47,7 +47,11 @@ public class p3{
 		}
 
 		public int[] getRegister() {
-			return register;
+			int[] returnReg = new int[register.length];
+			for (int i = 0; i < register.length; i++) {
+				returnReg[i] = register[i];
+			}
+			return returnReg;
 		}
 		
 	}
@@ -58,15 +62,18 @@ public class p3{
 		return j  ;
 	}
 
-	public static void correlationAttack() {
+	public static int[] correlationAttack(int[] poly, int[] startState, int loops) {
 		int[] keySeq = {0,0,0,0,0,1,1,1,0,1,1,1,0,1,0,0,0,1,1,0,0,0,1,0,1,1,0,1,1,1,1,0,0,0,1,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,0,1,0,0,0,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,0,1,1,0,1,1,1,1,1,0,1,1,1,0,0,0,1,1,1,1,0,1,0,1,0,0,0,1,1,1,0,1,1,0,0,1,0,1,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,1,1,1,1,0,1,1,1,0,1,0,1,0,0,1,1,0,1,1,0,0,0};
-		LFSR l13 = new LFSR(new int[] {1,0,1,1,0,0,1,1,0,1,0,1,1}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,1}, 2);
+		LFSR l13 = new LFSR(poly, startState, 2);
 		int counter = 0;
 		double max = 1;
-		int[] maxState = {0,0,0,0,0,0,0,0,0,0,0,0,1};
-		int[] init = new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-		while(counter < 9000) {
-			LFSR loop13 = new LFSR(new int[] {1,0,1,1,0,0,1,1,0,1,0,1,1}, l13.getRegister(), 2);
+		int out5 = 0;
+
+		int[] maxState = startState;
+		int[] init = startState;
+
+		for (int j = 0; j < loops; j++){
+			LFSR loop13 = new LFSR(poly, l13.getRegister(), 2);
 			double diff = 0;
 			int out = 0;
 			for (int i = 0; i < 193; i++){
@@ -75,43 +82,74 @@ public class p3{
 			}
 
 			if ((Arrays.equals(loop13.getRegister(), init))) {
-				System.out.println("got here");
+				for (int i = 0; i < maxState.length; i++) {
+					//System.out.print(loop13.getRegister()[i] + ", ");
+				}
+				//System.out.println("got here");
 			}
 
 			diff /= 193;
+			if (diff < .30) {
+				System.out.println(diff);
+			}
 			if (diff < max) {
 				max = diff;
-				maxState = loop13.getRegister();
-			} 
-			l13.shift(l13.compNext());
+				maxState = l13.getRegister();
+			}
 
-			counter++;
-			//System.out.print(out);
-			//if ((counter % 1000) == 0) System.out.println("Counter: " + counter);
+			l13.shift(l13.compNext());
+		
+
 		}
+
 		System.out.println(max);
 		for (int i = 0; i < maxState.length; i++) {
-			System.out.print(maxState[i] + ", ");
+			System.out.print(maxState[i] + " ");
+
 		}
-		System.out.println();
+		System.out.println("");
+		
+		return maxState;
 	}
+
+
 		
 	public static void main(String[] args){
-		//correlationAttack();
+		int[] start13 = correlationAttack(new int[] {1,0,1,1,0,0,1,1,0,1,0,1,1}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,1}, 9000);
+		int[] start15 = correlationAttack(new int[] {1,0,1,0,1,1,0,0,1,1,0,1,0,1,0}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, 33000);
+		int[] start17 = correlationAttack(new int[] {1,1,0,0,1,0,0,1,0,1,0,0,1,1,0,1,0}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, 132000);
 
 
 
-		//LFSR mod5 = new LFSR(new int[] {1,0,1,1,0,0,1,1,0,1,0,1,1}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,1}, 2);
-		LFSR mod5 = new LFSR(new int[] {1,0,1,0,1,1,0,0,1,1,0,1,0,1,0}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, 2);
-		//LFSR mod5 = new LFSR(new int[] {1,1,0,0,1,0,0,1,0,1,0,0,1,1,0,1,0}, new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, 2);
-		int out2;
-		int out5;
-		for (int i = 0; i < 33000; i++){
-			//out2 = mod2.shift(mod2.compNext());
-			out5 = mod5.shift(mod5.compNext());
-			System.out.print(out5);
+		String testNum = "";
+		String realNum = "0000011101110100011000101101111000100110001101111101000100101001100010010110111110111000111101010001110110010111101111010110100101100101010000000011111110010100001000000101111011101010011011000";
+		LFSR mod13 = new LFSR(new int[] {1,0,1,1,0,0,1,1,0,1,0,1,1}, start13, 2);
+		LFSR mod15 = new LFSR(new int[] {1,0,1,0,1,1,0,0,1,1,0,1,0,1,0}, start15, 2);
+		LFSR mod17 = new LFSR(new int[] {1,1,0,0,1,0,0,1,0,1,0,0,1,1,0,1,0}, start17, 2);
+		for (int i = 0; i < 193; i++){
+			int count = 0;
+			count += mod13.shift(mod13.compNext()) + mod15.shift(mod15.compNext()) + mod17.shift(mod17.compNext());
+			//System.out.println(count);
+			if (count > 1) {
+				testNum += "1";
+			} else {
+				testNum += "0";
+			}
+			
+			
 
 		}
+		if (testNum.equals(realNum)) {
+			System.out.println("True");
+		} else {
+			System.out.println("False");
+		}
+		System.out.println(testNum);
+		
+
+		//0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1
+		//0,0,1,1,0,0,1,1,1,0,0,1,1,0,0
+		//0,0,0,1,0,1,0,1,0,0,0,1,1,1,1,1,0
 	}
 }
 	
